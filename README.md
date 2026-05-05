@@ -7,45 +7,47 @@ A terminal-based SoundCloud player I built because I wanted to listen to music w
 
 ---
 
+![screenshot](assets/screenshot.png)
+
 ## Why?
 
-I spend most of my day in the terminal and I got tired of switching to a browser every time I wanted to play something on SoundCloud. I couldn't find a lightweight CLI tool that did what I wanted, so I made one. It hooks into SoundCloud's API, streams audio through mpv, and wraps everything in a nice TUI using [Textual](https://github.com/Textualize/textual).
+I spend most of my day in the terminal and I got tired of alt-tabbing to a browser every time I wanted to hear something on SoundCloud. I looked around for a CLI player that just works — couldn't really find one that fit what I needed. So I sat down and built my own. It talks to SoundCloud's API, pipes audio through mpv, and the whole interface runs inside [Textual](https://github.com/Textualize/textual).
 
 ## What it looks like
 
-The interface is split into two panels:
+Two panels side by side:
 
-- **Left** — a search bar and results table showing track title, artist, and duration
-- **Right** — album art, track name, artist, and play count for whatever track you've selected
+- **Left** — search bar at the top, results table below (title, artist, duration)
+- **Right** — album art rendered right in the terminal, plus track name, artist, and play count
 
-There's a now-playing bar pinned at the bottom with a seekable progress bar, timestamps, and volume info. The whole thing uses SoundCloud's orange (`#ff5500`) as an accent color so it actually feels on-brand.
+Bottom of the screen has a now-playing bar with a progress indicator you can actually click to seek, timestamps on the right, and volume. The accent color is SoundCloud's orange (`#ff5500`) throughout, which I think looks pretty clean.
 
 ## Features
 
-- **Search** — type a query, hit enter, get results
-- **Stream** — plays audio through mpv (no video, obviously)
-- **Album art** — pulls high-res artwork and renders it right in the terminal using `textual-image`
-- **Seekable progress bar** — click anywhere on the bar to jump to that position
-- **Track info panel** — shows the selected track's metadata at a glance
-- **Config file** — stores your `client_id` in `~/.config/soundcloud_cli/config.json` with `0600` permissions so it's not sitting around world-readable
+- **Search** — type something, hit enter, browse results
+- **Stream** — plays audio via mpv in the background (no video window)
+- **Album art** — grabs the high-res cover and renders it in your terminal with `textual-image`
+- **Seekable progress bar** — click on the bar to jump to any point in the track
+- **Track info panel** — quick glance at what you're listening to
+- **Secure config** — your `client_id` lives in `~/.config/soundcloud_cli/config.json` with `0600` permissions
 
 ## Dependencies
 
-You'll need these installed before running:
+You'll need:
 
 - **Python 3.10+**
-- **mpv** — handles the actual audio playback
-- **Textual** — the TUI framework
-- **textual-image** — for rendering album art in the terminal
-- **requests** — for API calls
+- **mpv** — does the actual audio playback
+- **Textual** — TUI framework
+- **textual-image** — terminal image rendering
+- **requests** — HTTP calls
 
-Install the Python deps:
+Install Python packages:
 
 ```bash
 pip install textual textual-image requests
 ```
 
-And make sure mpv is installed on your system:
+And mpv:
 
 ```bash
 # Debian / Ubuntu / Kali
@@ -60,14 +62,14 @@ brew install mpv
 
 ## Setup
 
-1. Clone the repo:
+1. Clone it:
 
 ```bash
 git clone https://github.com/ShadyVoxx/soundcloud_cli.git
 cd soundcloud_cli
 ```
 
-2. Add your SoundCloud `client_id` to the config file:
+2. Drop in your SoundCloud `client_id`:
 
 ```bash
 mkdir -p ~/.config/soundcloud_cli
@@ -75,9 +77,9 @@ echo '{"client_id": "YOUR_CLIENT_ID_HERE"}' > ~/.config/soundcloud_cli/config.js
 chmod 600 ~/.config/soundcloud_cli/config.json
 ```
 
-If you don't know how to get a client ID — open SoundCloud in your browser, open DevTools, go to the Network tab, and look for `client_id` in the query parameters of any API request. It's not hidden.
+> **How to get a client ID:** Open SoundCloud in your browser, open DevTools → Network tab, play any track, and look at the query params on any API request. You'll see `client_id` right there. Copy it.
 
-3. Run it:
+3. Run:
 
 ```bash
 python -m soundcloud_cli.ui
@@ -106,26 +108,49 @@ soundcloud_cli/
 
 ## How it works (briefly)
 
-- `api.py` talks to `api-v2.soundcloud.com` to search tracks and resolve progressive stream URLs
-- `player.py` spawns an mpv subprocess with `--no-video` and communicates through a Unix domain socket (`mpv --input-ipc-server`) for play/pause/seek/volume
-- `ui.py` ties it all together in a Textual app — polls playback position every second, updates the progress bar, and dispatches messages between widgets
-- Album art gets downloaded to `~/.cache/soundcloud_cli/artwork.jpg` and rendered via `textual-image`
+- `api.py` hits `api-v2.soundcloud.com` to search for tracks and grab progressive stream URLs
+- `player.py` spawns mpv with `--no-video` and talks to it over a Unix socket (`--input-ipc-server`) for play, pause, seek, volume — all of that
+- `ui.py` is the Textual app that glues everything together, polls playback every second, and passes messages between widgets
+- Album art gets cached at `~/.cache/soundcloud_cli/artwork.jpg` and displayed via `textual-image`
 
 ## A note on AI usage
 
-I wrote all the core logic myself — the API client, mpv IPC integration, widget architecture, and application flow. AI was used to help with the **styling and theming** (the `.tcss` stylesheet, color choices, layout tweaks) to make the interface look polished. The actual functionality and code structure is all me.
+I wrote all the logic, architecture, and functionality myself — the API client, mpv IPC communication, widget system, app flow, all of it. I used AI to help with the **styling** side of things (the `.tcss` stylesheet, picking colors, tweaking layout spacing) to make the UI look more polished. Everything under the hood is mine.
 
 ## Known limitations
 
-- Only plays tracks that have a progressive stream available (most do, some don't)
-- No playlist support yet — it's single-track playback for now
-- The `client_id` can stop working if SoundCloud rotates it — you'll need to grab a fresh one
-- No offline caching of tracks
+- Only streams tracks that have a progressive format available (most do, but some don't)
+- No playlist support yet — single track at a time for now
+- SoundCloud occasionally rotates `client_id` values, so yours might expire and you'll have to grab a new one
+- No offline mode or track caching
+
+## Contributing
+
+This is still pretty early and there's a lot of room to grow. If you want to help out or have ideas, I'd genuinely appreciate it. Here are some things I'd love to see:
+
+- **Playlist / queue support** — being able to queue up multiple tracks instead of one at a time
+- **Keyboard shortcuts** — play/pause, next, previous, volume up/down without touching the mouse
+- **Likes & reposts** — integrate with SoundCloud user accounts so you can browse your own library
+- **Better error handling** — some edge cases around network failures and missing streams could be smoother
+- **Packaging** — turning this into a proper `pip install`-able package
+
+If any of that sounds interesting to you, fork it, open a PR, or just open an issue to discuss. I'm not picky about process — if the code works and makes sense, it's getting merged. Even small stuff like fixing typos in this README or cleaning up code style is welcome.
+
+```bash
+# Fork it, clone your fork, make a branch, do your thing
+git checkout -b my-feature
+# ... make changes ...
+git commit -m "add: description of what you did"
+git push origin my-feature
+# Then open a PR on GitHub
+```
+
+No contribution is too small. Seriously.
 
 ## License
 
-MIT — do whatever you want with it.
+MIT — use it however you want.
 
 ---
 
-*Built because tab-switching to a browser for music is a mass productivity killer.*
+*Built because alt-tabbing to a browser for music is a mass productivity killer.*
