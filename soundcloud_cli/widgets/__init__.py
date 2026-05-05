@@ -1,0 +1,1 @@
+from soundcloud_cli.widgets.now_playing_bar import NowPlayingBar

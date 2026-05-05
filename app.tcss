@@ -1,0 +1,103 @@
+NowPlayingBar {
+    dock: bottom;
+    height: 3;
+    background: #1a1a1a;
+    border-top: solid #ff5500;
+    padding: 0 2;
+}
+
+NowPlayingBar Horizontal {
+    align: center middle;
+    height: 100%;
+}
+
+#now-playing-label-left {
+    width: 1fr;
+    color: #ffffff;
+    content-align: left middle;
+    height: 100%;
+}
+
+#now-playing-progress {
+    width: 2fr;
+    height: 1;
+}
+
+#now-playing-label-right {
+    width: 20;
+    color: #888888;
+    content-align: right middle;
+    height: 100%;
+}
+
+TrackList {
+    width: 70%;
+    border-right: solid #ff5500;
+}
+
+TrackInfo {
+    width: 30%;
+    padding: 1 2;
+}
+
+#search-input {
+    height: 3;
+    border: solid #ff5500;
+    margin: 0;
+    padding: 0 1;
+}
+
+#track-table {
+    height: 1fr;
+}
+
+#track-info {
+    height: 100%;
+    overflow-y: auto;
+}
+
+#image-wrapper {
+    width: 100%;
+    height: auto;
+    max-height: 50%;
+}
+
+#image-placeholder {
+    height: auto;
+    width: auto;
+}
+
+#track-info-divider {
+    color: #444444;
+    margin: 0 1;
+}
+
+#track-info-text-grouping {
+    width: 100%;
+    height: auto;
+    padding: 1 2;
+    margin: 0 1;
+    background: #1a1a1a;
+    border: round #333333;
+}
+
+#track-info-title-label {
+    color: #ffffff;
+    text-style: bold;
+    content-align: center middle;
+    width: 100%;
+    margin-bottom: 1;
+}
+
+#track-info-artist-label {
+    color: #ff5500;
+    content-align: center middle;
+    width: 100%;
+}
+
+#track-info-plays-label {
+    color: #888888;
+    content-align: center middle;
+    width: 100%;
+}
+
